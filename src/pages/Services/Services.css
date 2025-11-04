@@ -1,0 +1,28 @@
+.services-page {
+  padding: 20px;
+  min-height: 80vh;
+}
+
+.services-filter {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.services-filter input {
+  max-width: 400px;
+}
+
+.services-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.services-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}

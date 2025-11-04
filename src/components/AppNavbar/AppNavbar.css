@@ -1,0 +1,21 @@
+.header {
+  background: #FFCD00;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Логотип слева */
+  padding-left: 40px; /* Отступ от левого края */
+  position: relative;
+  flex-shrink: 0;
+  width: 100vw;
+  margin: 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
+.doc-icon {
+  width: 100px;
+  height: 100px;
+  background: url('/rectangle-2-6.png') center/contain no-repeat;
+  cursor: pointer;
+}
