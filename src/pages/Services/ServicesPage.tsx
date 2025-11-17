@@ -10,9 +10,10 @@ import type { LicenseService } from "../../types/ServiceTypes";
 import "./ServicesPage.css";
 
 export const ServicesPage: React.FC = () => {
-  const [services, setServices] = useState<LicenseService[]>([]);
+  const [services, setLicenseServices] = useState<LicenseService[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterName, setFilterName] = useState("");
+  const [cartCount, setCartCount] = useState<number>(0);
 
   const navigate = useNavigate();
 
@@ -20,14 +21,14 @@ export const ServicesPage: React.FC = () => {
     setLoading(true);
     try {
       const data = await getServices(query);
-      setServices(data.services || []);
+      setLicenseServices(data.services || []);
     } catch (error) {
       console.log("Failed to load from API, using mock data", error);
       // Используем mock данные при ошибке
       const filtered = SERVICES_MOCK.services.filter((s) =>
         s.name.toLowerCase().includes(query.toLowerCase())
       );
-      setServices(filtered);
+      setLicenseServices(filtered);
     } finally {
       setLoading(false);
     }
@@ -39,6 +40,29 @@ export const ServicesPage: React.FC = () => {
 
   const handleSearch = () => {
     loadServices(filterName);
+  };
+
+  // Метод добавления в корзину — по заданию возвращает 0 при успехе и -1 при ошибке.
+  const addToCart = async (serviceId: number): Promise<number> => {
+    try {
+      const res = await fetch(`/api/cart/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ service_id: serviceId }),
+      });
+
+      if (!res.ok) {
+        // Возвращаем -1 при любом не-OK статусе 
+        return -1;
+      }
+
+      // Если сервер ответил OK — считаем, что добавление успешно и возвращаем 0
+      setCartCount((c) => c + 1);
+      return 0;
+    } catch (err) {
+      console.error("addToCart error:", err);
+      return -1;
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -80,15 +104,30 @@ export const ServicesPage: React.FC = () => {
             <p>Попробуйте изменить параметры поиска</p>
           </div>
         ) : (
-          <div className="cards">
-            {services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                onClick={() => navigate(`${ROUTES.SERVICES}/${service.id}`)}
-              />
-            ))}
-          </div>
+          <>
+      {/* Cart icon on page */}
+      <div className="page-cart-icon" title="Корзина">
+        <img src="http://localhost:9000/img/cart.png" alt="Корзина" />
+        <div className="cart-counter">{cartCount}</div>
+      </div>
+            <div className="cards">
+              {services.map((service) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  onClick={() => navigate(`${ROUTES.SERVICES}/${service.id}`)}
+                  onAddToCart={async (id: number) => {
+                    const r = await addToCart(id);
+                    if (r === 0) {
+                      console.log(`service ${id} added to cart`);
+                    } else {
+                      console.log(`service ${id} add failed`);
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

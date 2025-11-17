@@ -5,15 +5,10 @@ import "./ServiceCard.css";
 interface ServiceCardProps {
   service: LicenseService;
   onClick: () => void;
+  onAddToCart?: (id: number) => void | Promise<void>;
 }
 
-const LICENSE_TYPE_LABELS: Record<string, string> = {
-  per_user: "на пользователя",
-  per_core: "на ядро CPU",
-  subscription: "годовую подписку",
-};
-
-export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
+export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick, onAddToCart }) => {
   const [imgError, setImgError] = React.useState(false);
   
   // Формируем URL для MinIO как в бэкенде
@@ -21,8 +16,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) =>
     ? `http://localhost:9000/license-images/${service.image_url}`
     : "/rectangle-2-6.png";
 
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAddToCart) {
+      try {
+        await onAddToCart(service.id);
+      } catch (err) {
+        console.error("onAddToCart handler error", err);
+      }
+    }
+  };
+
   return (
-    <div className="card" onClick={onClick}>
+    <div className="card">
       <div className="card-icon">
         <img 
           src={imgError ? "/rectangle-2-6.png" : imageUrl} 
@@ -32,12 +38,14 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) =>
       </div>
       <div className="card-title">{service.name}</div>
       <div className="card-desc">{service.description}</div>
-      <div className="card-price">
-        {service.base_price.toLocaleString()} ₽ / {LICENSE_TYPE_LABELS[service.license_type] || ""}
-      </div>
-      <button className="card-btn" onClick={(e) => { e.stopPropagation(); onClick(); }}>
-        →
+      
+      {/* Two buttons like in backend: Подробнее (yellow) and В корзину (green) */}
+      <button className="card-btn card-btn-details" onClick={(e) => { e.stopPropagation(); onClick(); }}>
+        Подробнее
       </button>
+      {/* <button className="card-btn card-btn-cart" onClick={handleAddToCart}>
+        🛒 В корзину
+      </button> */}
     </div>
   );
 };

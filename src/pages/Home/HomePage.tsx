@@ -19,7 +19,7 @@ export const HomePage: React.FC = () => {
           и техническую поддержку на всех этапах использования нашего ПО.
         </p>
         <Link to={ROUTES.SERVICES} className="home-button">
-          Просмотреть услуги
+          Просмотреть лицензии
         </Link>
       </div>
     </div>

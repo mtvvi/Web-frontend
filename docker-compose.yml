@@ -10,3 +10,11 @@ services:
     ports:
       - 3000:3000
     command: npm run dev
+    networks:
+      - license-network
+    environment:
+      - VITE_API_URL=http://host.docker.internal:8080
+
+networks:
+  license-network:
+    external: true
