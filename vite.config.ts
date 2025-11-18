@@ -112,6 +112,12 @@ export default defineConfig(({ mode }) => {
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, "/api"),
         },
+        "/storage": {
+          target: env.VITE_STORAGE_URL || "http://localhost:9000",
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/storage/, ""),
+        },
       },
       watch: {
         usePolling: true,
