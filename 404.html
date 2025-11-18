@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script>
+      (function () {
+        const segments = window.location.pathname.split('/').filter(Boolean);
+        const base = segments.length ? `/${segments[0]}/` : '/';
+        const redirectPath = window.location.pathname.replace(base, '') + window.location.search + window.location.hash;
+        sessionStorage.setItem('redirect', redirectPath);
+        window.location.replace(base);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
