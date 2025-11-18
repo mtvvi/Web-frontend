@@ -1,6 +1,6 @@
 /* Страница детали услуги */
 .service-detail-page {
-  padding: 40px 20px;
+  padding: 40px 20px 80px;
   min-height: 70vh;
   display: flex;
   flex-direction: column;
@@ -71,9 +71,10 @@
 }
 
 /* Контейнер карточки */
+
 .service-detail-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
   display: flex;
   justify-content: center;
   margin-top: 20px;
@@ -82,15 +83,15 @@
 /* Карточка услуги - точно такая же как в списке, но увеличенная */
 .service-detail-card {
   background: white;
-  border-radius: 24px;
-  padding: 30px 28px 28px;
+  border-radius: 32px;
+  padding: 40px;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  width: 420px;
-  min-height: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 20px;
 }
 
 .service-detail-card .card-icon {
@@ -110,61 +111,68 @@
 }
 
 .service-detail-card .card-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 700;
   color: #333;
   line-height: 1.3;
 }
 
 .service-detail-card .card-desc {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.6;
-  flex: 1;
+  color: #5c5c5c;
+  font-size: 16px;
+  line-height: 1.8;
   text-align: left;
   width: 100%;
 }
 
 .service-detail-card .card-info {
   width: 100%;
-  margin-bottom: 18px;
-  text-align: left;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
 
 .service-detail-card .card-license-type {
   font-size: 16px;
-  color: #666;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f8f8f8;
-  border-radius: 10px;
+  color: #505050;
+  padding: 16px;
+  background: #f4f6fb;
+  border-radius: 16px;
 }
 
 .service-detail-card .card-price {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  padding: 12px;
-  background: #fff9e6;
-  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1b1b1b;
+  padding: 16px;
+  background: #fff5d9;
+  border-radius: 16px;
 }
 
 .service-detail-card .card-btn {
   width: 100%;
   height: 60px;
-  border-radius: 25px;
-  color: black;
-  font-size: 20px;
-  font-weight: 500;
-  background: #FFCD00;
+  border-radius: 24px;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 600;
+  background: #ffcd00;
   border: none;
-  transition: background 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  flex-shrink: 0;
 }
 
 .service-detail-card .card-btn:hover {
-  background: #e6b800;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(255, 205, 0, 0.45);
+}
+
+@media (max-width: 640px) {
+  .service-detail-card {
+    padding: 28px 20px;
+  }
+
+  .service-detail-card .card-info {
+    grid-template-columns: 1fr;
+  }
 }

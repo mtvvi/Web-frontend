@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script>
+      (function () {
+        var repoSegment = 'Web-frontend';
+        var segments = window.location.pathname.split('/').filter(Boolean);
+        var hasRepo = segments[0] === repoSegment;
+        var redirectSegments = hasRepo ? segments.slice(1) : segments;
+        var redirectPath = '/' + redirectSegments.join('/');
+        if (redirectPath === '//') {
+          redirectPath = '/';
+        }
+
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+        sessionStorage.setItem('redirect', redirectPath + search + hash);
+
+        var repoBase = '/' + repoSegment + '/';
+        window.location.replace(repoBase);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

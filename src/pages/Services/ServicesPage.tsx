@@ -1,134 +1,166 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ServiceCard } from "../../components/ServiceCard/ServiceCard";
+import { FiltersPanel } from "../../components/FiltersPanel/FiltersPanel";
 import { ROUTES, ROUTE_LABELS } from "../../Routes";
-import { getServices } from "../../api/servicesApi";
+import { addServiceToCart, getServices } from "../../api/servicesApi";
 import { SERVICES_MOCK } from "../../mock/ServicesMock";
-import type { LicenseService } from "../../types/ServiceTypes";
+import type { LicenseService, ServiceFilterPayload } from "../../types/ServiceTypes";
+import { useAppSelector } from "../../store/hooks";
+import { selectAppliedFilters } from "../../features/filters/filtersSlice";
+import { useDesktopBridge } from "../../hooks/useDesktopBridge";
+import { resolvePublicAsset } from "../../utils/assets";
 import "./ServicesPage.css";
 
 export const ServicesPage: React.FC = () => {
   const [services, setLicenseServices] = useState<LicenseService[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterName, setFilterName] = useState("");
   const [cartCount, setCartCount] = useState<number>(0);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [cartError, setCartError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const appliedFilters = useAppSelector(selectAppliedFilters);
 
-  const loadServices = async (query = "") => {
+  const filterPayload = useMemo<ServiceFilterPayload>(() => {
+    const payload: ServiceFilterPayload = {};
+
+    if (appliedFilters.name.trim()) {
+      payload.name = appliedFilters.name.trim();
+    }
+
+    if (appliedFilters.licenseType !== "all") {
+      payload.licenseType = appliedFilters.licenseType;
+    }
+
+    const hasMin = appliedFilters.minPrice.trim() !== "";
+    const hasMax = appliedFilters.maxPrice.trim() !== "";
+
+    if (hasMin) {
+      const min = Number(appliedFilters.minPrice);
+      if (!Number.isNaN(min) && min >= 0) {
+        payload.minPrice = min;
+      }
+    }
+
+    if (hasMax) {
+      const max = Number(appliedFilters.maxPrice);
+      if (!Number.isNaN(max) && max >= 0) {
+        payload.maxPrice = max;
+      }
+    }
+
+    return payload;
+  }, [appliedFilters]);
+
+  const applyFiltersToMock = (filters: ServiceFilterPayload) => {
+    return SERVICES_MOCK.services.filter((service) => {
+      const matchesName = filters.name
+        ? service.name.toLowerCase().includes(filters.name.toLowerCase())
+        : true;
+      const matchesType = filters.licenseType ? service.license_type === filters.licenseType : true;
+      const matchesMin =
+        typeof filters.minPrice === "number" ? service.base_price >= filters.minPrice : true;
+      const matchesMax =
+        typeof filters.maxPrice === "number" ? service.base_price <= filters.maxPrice : true;
+      return matchesName && matchesType && matchesMin && matchesMax;
+    });
+  };
+
+  const loadServices = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getServices(query);
+      const data = await getServices(filterPayload);
       setLicenseServices(data.services || []);
+      setDataError(null);
     } catch (error) {
       console.log("Failed to load from API, using mock data", error);
-      // Используем mock данные при ошибке
-      const filtered = SERVICES_MOCK.services.filter((s) =>
-        s.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setLicenseServices(filtered);
+      setDataError("Сервис лицензий временно недоступен. Показаны mock-данные.");
+      setLicenseServices(applyFiltersToMock(filterPayload));
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterPayload]);
 
   useEffect(() => {
     loadServices();
-  }, []);
+  }, [loadServices]);
 
-  const handleSearch = () => {
-    loadServices(filterName);
-  };
+  const goHome = useCallback(() => navigate(ROUTES.HOME), [navigate]);
 
-  // Метод добавления в корзину — по заданию возвращает 0 при успехе и -1 при ошибке.
-  const addToCart = async (serviceId: number): Promise<number> => {
+  useDesktopBridge({
+    onRefresh: loadServices,
+    onNavigateHome: goHome,
+  });
+
+  const handleAddToCart = async (serviceId: number) => {
     try {
-      const res = await fetch(`/api/cart/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service_id: serviceId }),
-      });
-
-      if (!res.ok) {
-        // Возвращаем -1 при любом не-OK статусе 
-        return -1;
-      }
-
-      // Если сервер ответил OK — считаем, что добавление успешно и возвращаем 0
+      await addServiceToCart(serviceId);
       setCartCount((c) => c + 1);
-      return 0;
+      setCartError(null);
     } catch (err) {
-      console.error("addToCart error:", err);
-      return -1;
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
+      console.error("addToCart error", err);
+      setCartError("Не удалось добавить услугу в корзину");
     }
   };
 
   return (
     <div className="services-page">
-      <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.SERVICES }]} />
+      <div className="services-shell">
+        <aside className="page-cart-rail" aria-label="Корзина">
+          <div className="page-cart-icon" title="Корзина">
+            <img src={resolvePublicAsset("cart.png")} alt="Корзина" />
+            <div className="cart-counter">{cartCount}</div>
+          </div>
+        </aside>
 
-      <div className="content">
+        <section className="services-main">
+          <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.SERVICES }]} />
+
+          <div className="content">
         <div className="top-bar">
           <h1 className="title">Модели лицензирования</h1>
         </div>
 
-        <div className="search-form">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Поиск услуг..."
-            value={filterName}
-            onChange={(e) => setFilterName(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          <button className="search-btn" onClick={handleSearch} disabled={loading}>
-            Найти
-          </button>
-        </div>
+        <FiltersPanel isLoading={loading} />
 
-        {loading ? (
-          <div className="loading-spinner">
-            <Spinner animation="border" />
+        {dataError && (
+          <div className="error-banner" role="alert">
+            {dataError}
           </div>
-        ) : !services.length ? (
-          <div className="no-services">
-            <h3>Услуги не найдены</h3>
-            <p>Попробуйте изменить параметры поиска</p>
-          </div>
-        ) : (
-          <>
-      {/* Cart icon on page */}
-      <div className="page-cart-icon" title="Корзина">
-        <img src="http://localhost:9000/img/cart.png" alt="Корзина" />
-        <div className="cart-counter">{cartCount}</div>
-      </div>
-            <div className="cards">
-              {services.map((service) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  onClick={() => navigate(`${ROUTES.SERVICES}/${service.id}`)}
-                  onAddToCart={async (id: number) => {
-                    const r = await addToCart(id);
-                    if (r === 0) {
-                      console.log(`service ${id} added to cart`);
-                    } else {
-                      console.log(`service ${id} add failed`);
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          </>
         )}
+
+        {cartError && (
+          <div className="error-banner warning" role="alert">
+            {cartError}
+          </div>
+        )}
+
+            {loading ? (
+              <div className="loading-spinner">
+                <Spinner animation="border" />
+              </div>
+            ) : !services.length ? (
+              <div className="no-services">
+                <h3>Услуги не найдены</h3>
+                <p>Попробуйте изменить параметры поиска</p>
+              </div>
+            ) : (
+              <div className="cards">
+                {services.map((service) => (
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    onClick={() => navigate(`${ROUTES.SERVICES}/${service.id}`)}
+                    onAddToCart={handleAddToCart}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { ROUTES, ROUTE_LABELS } from "../../Routes";
 import { getServiceById } from "../../api/servicesApi";
 import { getServiceMockById } from "../../mock/ServicesMock";
 import type { LicenseService } from "../../types/ServiceTypes";
+import { resolvePublicAsset } from "../../utils/assets";
 import "./ServiceDetail.css";
 
 const LICENSE_TYPE_LABELS: Record<string, string> = {
@@ -92,10 +93,14 @@ export const ServiceDetailPage: React.FC = () => {
     );
   }
 
-  // Формирование URL изображения из MinIO
-  const imageUrl = service.image_url 
-    ? `http://localhost:9000/license-images/${service.image_url}`
-    : "/rectangle-2-6.png";
+  const storageBase = (import.meta.env.VITE_STORAGE_BASE_URL ?? "http://localhost:9000").replace(/\/$/, "");
+  const placeholder = resolvePublicAsset("rectangle-2-6.png");
+
+  const imageUrl = service.image_url
+    ? service.image_url.startsWith("http")
+      ? service.image_url
+      : `${storageBase}/license-images/${service.image_url}`
+    : placeholder;
 
   return (
     <div className="service-detail-page">
@@ -110,7 +115,7 @@ export const ServiceDetailPage: React.FC = () => {
         <div className="service-detail-card">
           <div className="card-icon">
             <img 
-              src={imgError ? "/rectangle-2-6.png" : imageUrl}
+              src={imgError ? placeholder : imageUrl}
               alt={service.name}
               onError={() => setImgError(true)}
             />
