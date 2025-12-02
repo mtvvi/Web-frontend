@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/1.5",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
+    "beforeBuildCommand": "cp .env.tauri .env.local && npm run build",
     "devPath": "https://localhost:3000",
     "distDir": "../dist",
     "withGlobalTauri": false
