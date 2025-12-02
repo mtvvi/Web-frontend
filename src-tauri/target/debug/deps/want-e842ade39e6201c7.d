@@ -1,7 +1,0 @@
-/Users/ilamatveev/Downloads/restinpeace/Web-frontend/src-tauri/target/debug/deps/want-e842ade39e6201c7.d: /Users/ilamatveev/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/want-0.3.1/src/lib.rs
-
-/Users/ilamatveev/Downloads/restinpeace/Web-frontend/src-tauri/target/debug/deps/libwant-e842ade39e6201c7.rlib: /Users/ilamatveev/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/want-0.3.1/src/lib.rs
-
-/Users/ilamatveev/Downloads/restinpeace/Web-frontend/src-tauri/target/debug/deps/libwant-e842ade39e6201c7.rmeta: /Users/ilamatveev/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/want-0.3.1/src/lib.rs
-
-/Users/ilamatveev/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/want-0.3.1/src/lib.rs:
