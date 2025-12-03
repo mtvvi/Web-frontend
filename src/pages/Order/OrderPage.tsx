@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Form, Spinner, Alert, Table } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -9,7 +9,6 @@ import {
   deleteOrder,
   formatOrder,
   removeServiceFromOrder,
-  updateServiceSupportLevel,
   setOrderFields,
   clearError,
 } from '../../store/slices/orderSlice';
@@ -29,11 +28,27 @@ export const OrderPage: React.FC = () => {
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
 
+  // Локальное состояние для строковых значений полей ввода
+  const [localFields, setLocalFields] = useState({
+    users: '',
+    cores: '',
+    period: '',
+  });
+
   useEffect(() => {
     if (id) {
       dispatch(getOrderDetail(Number(id)));
     }
   }, [dispatch, id]);
+
+  // Синхронизируем локальные поля с Redux при загрузке заказа
+  useEffect(() => {
+    setLocalFields({
+      users: String(orderFields.users),
+      cores: String(orderFields.cores),
+      period: String(orderFields.period),
+    });
+  }, [orderFields.users, orderFields.cores, orderFields.period]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -41,8 +56,16 @@ export const OrderPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleFieldChange = (field: 'users' | 'cores' | 'period', value: number) => {
-    dispatch(setOrderFields({ [field]: value }));
+  const handleFieldChange = (field: 'users' | 'cores' | 'period', value: string) => {
+    // Обновляем только локальное состояние при вводе
+    setLocalFields((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFieldBlur = (field: 'users' | 'cores' | 'period') => {
+    // При потере фокуса конвертируем в число и обновляем Redux
+    const numValue = localFields[field] === '' ? 0 : Number(localFields[field]);
+    dispatch(setOrderFields({ [field]: numValue }));
+    setLocalFields((prev) => ({ ...prev, [field]: String(numValue) }));
   };
 
   const handleSave = async () => {
@@ -83,27 +106,15 @@ export const OrderPage: React.FC = () => {
     }
   };
 
-  const handleSupportLevelChange = async (serviceId: number, level: number) => {
-    if (id && isDraft && serviceId) {
-      await dispatch(
-        updateServiceSupportLevel({
-          orderId: Number(id),
-          serviceId,
-          supportLevel: level,
-        })
-      );
-    }
-  };
-
   const getStatusLabel = (status?: string) => {
     switch (status) {
-      case 'draft':
+      case 'черновик':
         return 'Черновик';
-      case 'formatted':
+      case 'сформирован':
         return 'Сформирован';
-      case 'completed':
+      case 'завершён':
         return 'Завершен';
-      case 'rejected':
+      case 'отклонён':
         return 'Отклонен';
       default:
         return status;
@@ -177,8 +188,9 @@ export const OrderPage: React.FC = () => {
                   <Form.Control
                     type="number"
                     min={0}
-                    value={orderFields.users}
-                    onChange={(e) => handleFieldChange('users', Number(e.target.value))}
+                    value={localFields.users}
+                    onChange={(e) => handleFieldChange('users', e.target.value)}
+                    onBlur={() => handleFieldBlur('users')}
                   />
                 </Form.Group>
               </Col>
@@ -188,8 +200,9 @@ export const OrderPage: React.FC = () => {
                   <Form.Control
                     type="number"
                     min={0}
-                    value={orderFields.cores}
-                    onChange={(e) => handleFieldChange('cores', Number(e.target.value))}
+                    value={localFields.cores}
+                    onChange={(e) => handleFieldChange('cores', e.target.value)}
+                    onBlur={() => handleFieldBlur('cores')}
                   />
                 </Form.Group>
               </Col>
@@ -198,9 +211,10 @@ export const OrderPage: React.FC = () => {
                   <Form.Label>Период (месяцев)</Form.Label>
                   <Form.Control
                     type="number"
-                    min={1}
-                    value={orderFields.period}
-                    onChange={(e) => handleFieldChange('period', Number(e.target.value))}
+                    min={0}
+                    value={localFields.period}
+                    onChange={(e) => handleFieldChange('period', e.target.value)}
+                    onBlur={() => handleFieldBlur('period')}
                   />
                 </Form.Group>
               </Col>
@@ -273,26 +287,7 @@ export const OrderPage: React.FC = () => {
                       <td>{service.name}</td>
                       <td>{service.license_type}</td>
                       <td>{service.base_price?.toLocaleString()} ₽</td>
-                      <td>
-                        {isDraft ? (
-                          <Form.Select
-                            size="sm"
-                            value={service.support_level || 1}
-                            onChange={(e) =>
-                              service.id &&
-                              handleSupportLevelChange(service.id, Number(e.target.value))
-                            }
-                          >
-                            <option value={0.7}>0.7 - Базовая</option>
-                            <option value={1}>1.0 - Стандартная</option>
-                            <option value={1.5}>1.5 - Расширенная</option>
-                            <option value={2}>2.0 - Премиум</option>
-                            <option value={3}>3.0 - Enterprise</option>
-                          </Form.Select>
-                        ) : (
-                          service.support_level || 1
-                        )}
-                      </td>
+                      <td>1</td>
                       <td>{service.subtotal?.toLocaleString()} ₽</td>
                       {isDraft && (
                         <td>

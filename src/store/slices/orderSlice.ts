@@ -169,12 +169,12 @@ const orderSlice = createSlice({
         state.loading = false;
         state.currentOrder = action.payload;
         state.services = action.payload.services || [];
-        state.isDraft = action.payload.status === 'draft';
+        state.isDraft = action.payload.status === 'черновик';
         if (action.payload) {
           state.orderFields = {
-            users: action.payload.users || 1,
-            cores: action.payload.cores || 1,
-            period: action.payload.period || 12,
+            users: action.payload.users ?? 0,
+            cores: action.payload.cores ?? 0,
+            period: action.payload.period ?? 0,
           };
         }
       })

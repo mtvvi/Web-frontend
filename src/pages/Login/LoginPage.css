@@ -1,69 +1,69 @@
 .login-page {
   min-height: calc(100vh - 80px);
   padding: 40px 20px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: #f5f5f5;
 }
 
 .login-container {
   max-width: 400px;
-  background: rgba(255, 255, 255, 0.05);
+  background: #fff;
   border-radius: 16px;
   padding: 40px;
   margin-top: 40px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
 }
 
 .login-title {
   text-align: center;
   margin-bottom: 30px;
-  color: #fff;
+  color: #333;
   font-weight: 600;
 }
 
 .login-page .form-label {
-  color: #b0b0b0;
+  color: #555;
   font-size: 14px;
 }
 
 .login-page .form-control {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #333;
   padding: 12px 16px;
   border-radius: 8px;
 }
 
 .login-page .form-control:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #f4c542;
-  box-shadow: 0 0 0 0.2rem rgba(244, 197, 66, 0.25);
-  color: #fff;
+  background: #fff;
+  border-color: #FFCD00;
+  box-shadow: 0 0 0 0.2rem rgba(255, 205, 0, 0.25);
+  color: #333;
 }
 
 .login-page .form-control::placeholder {
-  color: #888;
+  color: #999;
 }
 
 .login-btn {
-  background: linear-gradient(135deg, #f4c542 0%, #f0a500 100%);
+  background: #FFCD00;
   border: none;
   padding: 12px;
   font-weight: 600;
   border-radius: 8px;
-  color: #1a1a2e;
+  color: #333;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .login-btn:hover {
-  background: linear-gradient(135deg, #f0a500 0%, #e09400 100%);
+  background: #e6b800;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(244, 197, 66, 0.4);
-  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(255, 205, 0, 0.4);
+  color: #333;
 }
 
 .login-btn:disabled {
-  background: #666;
+  background: #ccc;
   transform: none;
   box-shadow: none;
 }
@@ -71,11 +71,11 @@
 .login-footer {
   text-align: center;
   margin-top: 20px;
-  color: #b0b0b0;
+  color: #666;
 }
 
 .login-footer a {
-  color: #f4c542;
+  color: #0066cc;
   text-decoration: none;
 }
 

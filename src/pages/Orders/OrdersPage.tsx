@@ -29,13 +29,13 @@ export const OrdersPage: React.FC = () => {
 
   const getStatusLabel = (status?: string) => {
     switch (status) {
-      case 'draft':
+      case 'черновик':
         return 'Черновик';
-      case 'formatted':
+      case 'сформирован':
         return 'Сформирован';
-      case 'completed':
+      case 'завершён':
         return 'Завершен';
-      case 'rejected':
+      case 'отклонён':
         return 'Отклонен';
       default:
         return status;
