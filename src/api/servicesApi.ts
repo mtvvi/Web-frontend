@@ -7,7 +7,7 @@ import { getJson, postJson } from "./httpClient";
 
 const normalizeBase = (base: string) => base.replace(/\/$/, "");
 
-const API_BASE = normalizeBase(import.meta.env.VITE_API_BASE_URL ?? "/api");
+const API_BASE = normalizeBase(import.meta.env.VITE_API_BASE_URL || "/api");
 
 const buildQueryString = (filters?: ServiceFilterPayload) => {
   if (!filters) {

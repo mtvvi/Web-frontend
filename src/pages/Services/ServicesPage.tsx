@@ -1,28 +1,34 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ServiceCard } from "../../components/ServiceCard/ServiceCard";
 import { FiltersPanel } from "../../components/FiltersPanel/FiltersPanel";
 import { ROUTES, ROUTE_LABELS } from "../../Routes";
-import { addServiceToCart, getServices } from "../../api/servicesApi";
+import { getServices } from "../../api/servicesApi";
 import { SERVICES_MOCK } from "../../mock/ServicesMock";
 import type { LicenseService, ServiceFilterPayload } from "../../types/ServiceTypes";
 import { useAppSelector } from "../../store/hooks";
 import { selectAppliedFilters } from "../../features/filters/filtersSlice";
 import { useDesktopBridge } from "../../hooks/useDesktopBridge";
 import { resolvePublicAsset } from "../../utils/assets";
+import type { AppDispatch, RootState } from "../../store";
+import { addServiceToOrder, getCartInfo } from "../../store/slices/servicesSlice";
 import "./ServicesPage.css";
 
 export const ServicesPage: React.FC = () => {
   const [services, setLicenseServices] = useState<LicenseService[]>([]);
   const [loading, setLoading] = useState(false);
-  const [cartCount, setCartCount] = useState<number>(0);
   const [dataError, setDataError] = useState<string | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
 
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const appliedFilters = useAppSelector(selectAppliedFilters);
+  
+  const { isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { cartOrderId, cartCount } = useSelector((state: RootState) => state.services);
 
   const filterPayload = useMemo<ServiceFilterPayload>(() => {
     const payload: ServiceFilterPayload = {};
@@ -88,6 +94,12 @@ export const ServicesPage: React.FC = () => {
     loadServices();
   }, [loadServices]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getCartInfo());
+    }
+  }, [dispatch, isAuthenticated]);
+
   const goHome = useCallback(() => navigate(ROUTES.HOME), [navigate]);
 
   useDesktopBridge({
@@ -96,9 +108,12 @@ export const ServicesPage: React.FC = () => {
   });
 
   const handleAddToCart = async (serviceId: number) => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
     try {
-      await addServiceToCart(serviceId);
-      setCartCount((c) => c + 1);
+      await dispatch(addServiceToOrder(serviceId)).unwrap();
       setCartError(null);
     } catch (err) {
       console.error("addToCart error", err);
@@ -106,13 +121,24 @@ export const ServicesPage: React.FC = () => {
     }
   };
 
+  const handleCartClick = () => {
+    if (cartOrderId) {
+      navigate(`${ROUTES.ORDER}/${cartOrderId}`);
+    }
+  };
+
   return (
     <div className="services-page">
       <div className="services-shell">
         <aside className="page-cart-rail" aria-label="Корзина">
-          <div className="page-cart-icon" title="Корзина">
+          <div 
+            className={`page-cart-icon ${cartOrderId ? 'clickable' : ''}`} 
+            title={cartOrderId ? "Перейти к заявке" : "Корзина пуста"}
+            onClick={handleCartClick}
+            style={{ cursor: cartOrderId ? 'pointer' : 'default' }}
+          >
             <img src={resolvePublicAsset("cart.png")} alt="Корзина" />
-            <div className="cart-counter">{cartCount}</div>
+            <div className="cart-counter">{isAuthenticated ? cartCount : 0}</div>
           </div>
         </aside>
 

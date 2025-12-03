@@ -1,0 +1,229 @@
+.order-page {
+  min-height: calc(100vh - 80px);
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.order-container {
+  max-width: 1000px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 40px;
+  margin-top: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.order-header h2 {
+  color: #fff;
+  margin: 0;
+}
+
+.order-status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-draft {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.status-formatted {
+  background: rgba(13, 202, 240, 0.2);
+  color: #0dcaf0;
+}
+
+.status-completed {
+  background: rgba(25, 135, 84, 0.2);
+  color: #198754;
+}
+
+.status-rejected {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.order-info {
+  margin-bottom: 30px;
+}
+
+.order-info p {
+  color: #b0b0b0;
+  margin: 5px 0;
+}
+
+.order-info strong {
+  color: #fff;
+}
+
+.order-fields {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.order-fields h4 {
+  color: #f4c542;
+  margin-bottom: 20px;
+}
+
+.order-fields .form-label {
+  color: #b0b0b0;
+}
+
+.order-fields .form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.order-fields .form-control:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #f4c542;
+  box-shadow: none;
+  color: #fff;
+}
+
+.order-params {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.order-params p {
+  color: #fff;
+  margin: 5px 0;
+}
+
+.order-services {
+  margin-bottom: 30px;
+}
+
+.order-services h4 {
+  color: #f4c542;
+  margin-bottom: 20px;
+}
+
+.no-services {
+  color: #888;
+  text-align: center;
+  padding: 40px;
+}
+
+.services-table {
+  color: #fff;
+}
+
+.services-table th {
+  color: #b0b0b0;
+  border-color: rgba(255, 255, 255, 0.1);
+  font-weight: 500;
+}
+
+.services-table td {
+  border-color: rgba(255, 255, 255, 0.1);
+  vertical-align: middle;
+}
+
+.service-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.services-table .form-select {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  min-width: 150px;
+}
+
+.services-table .form-select option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.order-total {
+  text-align: right;
+  padding: 20px;
+  background: rgba(78, 205, 196, 0.1);
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.order-total h4 {
+  color: #4ecdc4;
+  margin: 0;
+}
+
+.order-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  border: none;
+  padding: 10px 24px;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 15px;
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #44a08d 0%, #3d9680 100%);
+}
+
+.btn-format {
+  background: linear-gradient(135deg, #f4c542 0%, #f0a500 100%);
+  border: none;
+  padding: 12px 30px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.btn-format:hover {
+  background: linear-gradient(135deg, #f0a500 0%, #e09400 100%);
+  color: #1a1a2e;
+}
+
+.btn-format:disabled {
+  background: #666;
+  color: #999;
+}
+
+.btn-delete {
+  background: transparent;
+  border: 2px solid #dc3545;
+  color: #dc3545;
+  padding: 12px 30px;
+  font-weight: 600;
+}
+
+.btn-delete:hover {
+  background: #dc3545;
+  color: #fff;
+}
