@@ -1,0 +1,144 @@
+.order-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-color: #FFCD00;
+}
+
+.order-card:focus {
+  outline: 2px solid #FFCD00;
+  outline-offset: 2px;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-card-number {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.order-card-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.order-card-status.status-черновик {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.order-card-status.status-сформирован {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.order-card-status.status-завершён {
+  background: #d4edda;
+  color: #155724;
+}
+
+.order-card-status.status-отклонён {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.order-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.order-card-label {
+  color: #666;
+}
+
+.order-card-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.order-card-params {
+  display: flex;
+  justify-content: space-around;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.order-card-param {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.param-icon {
+  font-size: 20px;
+}
+
+.param-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.param-label {
+  font-size: 12px;
+  color: #666;
+}
+
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.order-card-total {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.order-card-btn {
+  background: #FFCD00;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.order-card-btn:hover {
+  background: #e6b800;
+}

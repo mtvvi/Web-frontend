@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Container, Table, Spinner, Alert, Button } from 'react-bootstrap';
+import { Container, Spinner, Alert, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import type { AppDispatch, RootState } from '../../store';
 import { getOrdersList, clearError } from '../../store/slices/orderSlice';
 import { BreadCrumbs } from '../../components/BreadCrumbs/BreadCrumbs';
+import { OrderCard } from '../../components/OrderCard/OrderCard';
 import { ROUTES, ROUTE_LABELS } from '../../Routes';
 import './OrdersPage.css';
 
@@ -27,22 +28,7 @@ export const OrdersPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const getStatusLabel = (status?: string) => {
-    switch (status) {
-      case 'черновик':
-        return 'Черновик';
-      case 'сформирован':
-        return 'Сформирован';
-      case 'завершён':
-        return 'Завершен';
-      case 'отклонён':
-        return 'Отклонен';
-      default:
-        return status;
-    }
-  };
-
-  const handleRowClick = (orderId: number | undefined) => {
+  const handleCardClick = (orderId: number | undefined) => {
     if (orderId) {
       navigate(`${ROUTES.ORDER}/${orderId}`);
     }
@@ -79,52 +65,15 @@ export const OrdersPage: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <Table responsive hover className="orders-table">
-            <thead>
-              <tr>
-                <th>№ заявки</th>
-                <th>Статус</th>
-                <th>Дата создания</th>
-                <th>Дата формирования</th>
-                <th>Дата завершения</th>
-                <th>Итого</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr 
-                  key={order.id} 
-                  onClick={() => handleRowClick(order.id)}
-                  className="order-row"
-                >
-                  <td>#{order.id}</td>
-                  <td>
-                    <span className={`order-status status-${order.status}`}>
-                      {getStatusLabel(order.status)}
-                    </span>
-                  </td>
-                  <td>
-                    {order.created_at
-                      ? new Date(order.created_at).toLocaleDateString('ru-RU')
-                      : '—'}
-                  </td>
-                  <td>
-                    {order.formatted_at
-                      ? new Date(order.formatted_at).toLocaleDateString('ru-RU')
-                      : '—'}
-                  </td>
-                  <td>
-                    {order.completed_at
-                      ? new Date(order.completed_at).toLocaleDateString('ru-RU')
-                      : '—'}
-                  </td>
-                  <td className="order-total">
-                    {order.total_cost?.toLocaleString() || 0} ₽
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div className="orders-grid">
+            {orders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onClick={() => handleCardClick(order.id)}
+              />
+            ))}
+          </div>
         )}
       </Container>
     </div>

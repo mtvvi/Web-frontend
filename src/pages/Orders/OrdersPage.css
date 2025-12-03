@@ -51,65 +51,19 @@
   color: #333;
 }
 
-.orders-table {
-  color: #333;
+/* Grid для карточек заявок */
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
 
-.orders-table th {
-  color: #555;
-  border-color: #e0e0e0;
-  font-weight: 500;
-  padding: 15px;
-  background: #fafafa;
-}
-
-.orders-table td {
-  border-color: #e0e0e0;
-  padding: 15px;
-  vertical-align: middle;
-}
-
-.order-row {
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.order-row:hover {
-  background: #f9f9f9;
-}
-
-.order-status {
-  padding: 6px 12px;
-  border-radius: 15px;
-  font-weight: 500;
-  font-size: 13px;
-}
-
-.status-draft,
-.status-черновик {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-formatted,
-.status-сформирован {
-  background: #cce5ff;
-  color: #004085;
-}
-
-.status-completed,
-.status-завершён {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-rejected,
-.status-отклонён {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.order-total {
-  font-weight: 600;
-  color: #333;
+@media (max-width: 768px) {
+  .orders-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .orders-container {
+    padding: 20px;
+  }
 }
