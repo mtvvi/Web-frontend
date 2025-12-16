@@ -36,7 +36,10 @@ export default defineConfig(({ mode }) => {
 
   const runtimeCaching: RuntimeCaching = []
   const apiUrl = toUrl(env.VITE_API_BASE_URL)
-  const storageUrl = toUrl(env.VITE_STORAGE_BASE_URL)
+  // For storage, use full URL if available, otherwise skip runtime caching for relative paths
+  const storageUrl = env.VITE_STORAGE_BASE_URL?.startsWith('http') 
+    ? toUrl(env.VITE_STORAGE_BASE_URL) 
+    : null
 
   if (apiUrl) {
     runtimeCaching.push({
