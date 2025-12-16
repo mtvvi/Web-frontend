@@ -35,6 +35,13 @@
   margin: 0;
 }
 
+.order-ready {
+  margin-top: -10px;
+  margin-bottom: 20px;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
 .order-status {
   padding: 8px 16px;
   border-radius: 20px;
@@ -190,6 +197,10 @@
   display: flex;
   gap: 15px;
   justify-content: flex-end;
+}
+
+.moderator-actions {
+  margin-top: 10px;
 }
 
 .btn-save {

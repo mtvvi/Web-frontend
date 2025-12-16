@@ -122,6 +122,12 @@
   border-top: 1px solid #eee;
 }
 
+.order-card-ready {
+  margin-top: -6px;
+  font-size: 14px;
+  color: #2e7d32;
+}
+
 .order-card-total {
   font-size: 20px;
   font-weight: 700;

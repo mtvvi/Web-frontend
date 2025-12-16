@@ -16,6 +16,17 @@ export interface DtoLoginRequest {
   password: string;
 }
 
+export interface DtoLoginResponse {
+  status?: string;
+  message?: string;
+  user_id?: number;
+  role?: number;
+  token?: string;
+  login?: string;
+  expires_in?: number;
+  token_type?: string;
+}
+
 export interface DtoRegisterRequest {
   full_name?: string;
   is_moderator?: boolean;
@@ -77,6 +88,7 @@ export interface DtoOrderResponse {
   status?: string;
   total_cost?: number;
   users?: number;
+  ready_services?: number;
 }
 
 export interface DtoOrderListResponse {
@@ -191,7 +203,7 @@ export class Api extends HttpClient {
      * @description Аутентификация пользователя с возвратом JWT токена
      */
     loginCreate: (data: DtoLoginRequest) =>
-      this.request<{ token?: string; login?: string }>({
+      this.request<DtoLoginResponse>({
         path: `/api/auth/login`,
         method: "POST",
         body: data,

@@ -3,14 +3,18 @@ import { api } from '../../api';
 
 interface UserState {
   username: string;
+  role: number | null;
   isAuthenticated: boolean;
+  isModerator: boolean;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
   username: localStorage.getItem('username') || '',
+  role: localStorage.getItem('role') ? Number(localStorage.getItem('role')) : null,
   isAuthenticated: !!localStorage.getItem('token'),
+  isModerator: localStorage.getItem('role') ? Number(localStorage.getItem('role')) >= 2 : false,
   loading: false,
   error: null,
 };
@@ -21,12 +25,15 @@ export const loginUser = createAsyncThunk(
   async (credentials: { login: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await api.auth.loginCreate(credentials);
-      const { token, login } = response.data;
+      const { token, login, role } = response.data;
       if (token) {
         localStorage.setItem('token', token);
         localStorage.setItem('username', login || credentials.login);
+        if (role !== undefined) {
+          localStorage.setItem('role', String(role));
+        }
       }
-      return { login: login || credentials.login };
+      return { login: login || credentials.login, role: role ?? null };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка авторизации');
     }
@@ -58,11 +65,13 @@ export const logoutUser = createAsyncThunk(
       await api.auth.logoutCreate();
       localStorage.removeItem('token');
       localStorage.removeItem('username');
+      localStorage.removeItem('role');
       return null;
     } catch (error: any) {
       // Даже если запрос не удался, очищаем локальное состояние
       localStorage.removeItem('token');
       localStorage.removeItem('username');
+      localStorage.removeItem('role');
       return rejectWithValue(error.response?.data?.message || 'Ошибка при выходе');
     }
   }
@@ -91,8 +100,11 @@ const userSlice = createSlice({
     checkAuth: (state) => {
       const token = localStorage.getItem('token');
       const username = localStorage.getItem('username');
+       const role = localStorage.getItem('role');
       state.isAuthenticated = !!token;
       state.username = username || '';
+       state.role = role ? Number(role) : null;
+       state.isModerator = role ? Number(role) >= 2 : false;
     },
   },
   extraReducers: (builder) => {
@@ -103,20 +115,24 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isAuthenticated = true;
-        state.username = action.payload.login;
-        state.error = null;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.isAuthenticated = false;
-      })
-      // Register
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      state.loading = false;
+      state.isAuthenticated = true;
+      state.username = action.payload.login;
+      state.role = action.payload.role;
+      state.isModerator = (action.payload.role ?? -1) >= 2;
+      state.error = null;
+    })
+    .addCase(loginUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+      state.isAuthenticated = false;
+      state.role = null;
+      state.isModerator = false;
+    })
+    // Register
+    .addCase(registerUser.pending, (state) => {
+      state.loading = true;
+      state.error = null;
       })
       .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
@@ -125,17 +141,21 @@ const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      })
-      // Logout
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.isAuthenticated = false;
-        state.username = '';
-        state.error = null;
-      })
-      .addCase(logoutUser.rejected, (state) => {
-        state.isAuthenticated = false;
-        state.username = '';
-      })
+    })
+    // Logout
+    .addCase(logoutUser.fulfilled, (state) => {
+      state.isAuthenticated = false;
+      state.username = '';
+      state.role = null;
+      state.isModerator = false;
+      state.error = null;
+    })
+    .addCase(logoutUser.rejected, (state) => {
+      state.isAuthenticated = false;
+      state.username = '';
+      state.role = null;
+      state.isModerator = false;
+    })
       // Update Profile
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;

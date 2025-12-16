@@ -9,6 +9,8 @@ import {
   deleteOrder,
   formatOrder,
   removeServiceFromOrder,
+  completeOrder,
+  rejectOrder,
   setOrderFields,
   clearError,
 } from '../../store/slices/orderSlice';
@@ -26,7 +28,7 @@ export const OrderPage: React.FC = () => {
   const { currentOrder, services, loading, error, isDraft, orderFields } = useSelector(
     (state: RootState) => state.order
   );
-  const { isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { isAuthenticated, isModerator } = useSelector((state: RootState) => state.user);
 
   // Локальное состояние для строковых значений полей ввода
   const [localFields, setLocalFields] = useState({
@@ -56,9 +58,26 @@ export const OrderPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  // Шорт-поллинг деталки после завершения для подтяжки async sub_total
+  useEffect(() => {
+    if (!id || !currentOrder) return undefined;
+    if (currentOrder.status !== 'завершён') return undefined;
+
+    const interval = setInterval(() => {
+      dispatch(getOrderDetail(Number(id)));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [dispatch, id, currentOrder]);
+
   const handleFieldChange = (field: 'users' | 'cores' | 'period', value: string) => {
+    // Убираем ведущие нули (например, "01" -> "1", но "0" остается "0")
+    let cleanValue = value;
+    if (value.length > 1 && value.startsWith('0')) {
+      cleanValue = value.replace(/^0+/, '') || '0';
+    }
     // Обновляем только локальное состояние при вводе
-    setLocalFields((prev) => ({ ...prev, [field]: value }));
+    setLocalFields((prev) => ({ ...prev, [field]: cleanValue }));
   };
 
   const handleFieldBlur = (field: 'users' | 'cores' | 'period') => {
@@ -66,21 +85,33 @@ export const OrderPage: React.FC = () => {
     const numValue = localFields[field] === '' ? 0 : Number(localFields[field]);
     dispatch(setOrderFields({ [field]: numValue }));
     setLocalFields((prev) => ({ ...prev, [field]: String(numValue) }));
-  };
-
-  const handleSave = async () => {
+    
+    // Автосохранение при потере фокуса - только если значения валидны
     if (id && isDraft) {
-      await dispatch(
+      const updatedFields = {
+        user_count: field === 'users' ? numValue : orderFields.users,
+        core_count: field === 'cores' ? numValue : orderFields.cores,
+        period: field === 'period' ? numValue : orderFields.period,
+      };
+      
+      // Не отправляем если period < 1 (валидация на бэкенде требует >= 1)
+      if (updatedFields.period < 1) {
+        return;
+      }
+      
+      dispatch(
         updateOrderFields({
           orderId: Number(id),
-          data: {
-            user_count: orderFields.users,
-            core_count: orderFields.cores,
-            period: orderFields.period,
-          },
+          data: updatedFields,
         })
       );
-      dispatch(getOrderDetail(Number(id)));
+    }
+  };
+
+  const handleFieldKeyPress = (field: 'users' | 'cores' | 'period', e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleFieldBlur(field);
+      (e.target as HTMLInputElement).blur();
     }
   };
 
@@ -97,6 +128,20 @@ export const OrderPage: React.FC = () => {
       await dispatch(formatOrder(Number(id)));
       dispatch(clearCart());
       navigate(ROUTES.ORDERS);
+    }
+  };
+
+  const handleComplete = async () => {
+    if (id && currentOrder?.status === 'сформирован') {
+      await dispatch(completeOrder(Number(id)));
+      dispatch(getOrderDetail(Number(id)));
+    }
+  };
+
+  const handleReject = async () => {
+    if (id && currentOrder?.status === 'сформирован') {
+      await dispatch(rejectOrder(Number(id)));
+      dispatch(getOrderDetail(Number(id)));
     }
   };
 
@@ -157,6 +202,12 @@ export const OrderPage: React.FC = () => {
           </span>
         </div>
 
+        {typeof currentOrder?.ready_services === 'number' && (
+          <div className="order-ready">
+            Рассчитано услуг: {currentOrder.ready_services}
+          </div>
+        )}
+
         <div className="order-info">
           <p>
             <strong>Создана:</strong>{' '}
@@ -191,6 +242,7 @@ export const OrderPage: React.FC = () => {
                     value={localFields.users}
                     onChange={(e) => handleFieldChange('users', e.target.value)}
                     onBlur={() => handleFieldBlur('users')}
+                    onKeyPress={(e) => handleFieldKeyPress('users', e)}
                   />
                 </Form.Group>
               </Col>
@@ -203,25 +255,27 @@ export const OrderPage: React.FC = () => {
                     value={localFields.cores}
                     onChange={(e) => handleFieldChange('cores', e.target.value)}
                     onBlur={() => handleFieldBlur('cores')}
+                    onKeyPress={(e) => handleFieldKeyPress('cores', e)}
                   />
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Период (месяцев)</Form.Label>
+                  <Form.Label>Период (месяцев) *</Form.Label>
                   <Form.Control
                     type="number"
-                    min={0}
+                    min={1}
                     value={localFields.period}
                     onChange={(e) => handleFieldChange('period', e.target.value)}
                     onBlur={() => handleFieldBlur('period')}
+                    onKeyPress={(e) => handleFieldKeyPress('period', e)}
                   />
                 </Form.Group>
               </Col>
             </Row>
-            <Button className="btn-save" onClick={handleSave}>
-              Сохранить параметры
-            </Button>
+            <div className="text-muted small">
+              * Период должен быть не менее 1 месяца. Параметры сохраняются автоматически при нажатии Enter или при переходе к следующему полю.
+            </div>
           </div>
         )}
 
@@ -258,9 +312,9 @@ export const OrderPage: React.FC = () => {
                   <th>Изображение</th>
                   <th>Название</th>
                   <th>Тип лицензии</th>
-                  <th>Базовая цена</th>
-                  <th>Коэф. поддержки</th>
-                  <th>Подытог</th>
+                  {(!isDraft || isModerator) && <th>Базовая цена</th>}
+                  {(!isDraft || isModerator) && <th>Коэф. поддержки</th>}
+                  {(!isDraft || isModerator) && <th>Подытог</th>}
                   {isDraft && <th>Действия</th>}
                 </tr>
               </thead>
@@ -286,9 +340,9 @@ export const OrderPage: React.FC = () => {
                       </td>
                       <td>{service.name}</td>
                       <td>{service.license_type}</td>
-                      <td>{service.base_price?.toLocaleString()} ₽</td>
-                      <td>1</td>
-                      <td>{service.subtotal?.toLocaleString()} ₽</td>
+                      {(!isDraft || isModerator) && <td>{service.base_price?.toLocaleString()} ₽</td>}
+                      {(!isDraft || isModerator) && <td>{service.support_level ?? 1}</td>}
+                      {(!isDraft || isModerator) && <td>{service.subtotal?.toLocaleString()} ₽</td>}
                       {isDraft && (
                         <td>
                           <Button
@@ -308,9 +362,11 @@ export const OrderPage: React.FC = () => {
           )}
         </div>
 
-        <div className="order-total">
-          <h4>Итого: {currentOrder?.total_cost?.toLocaleString() || 0} ₽</h4>
-        </div>
+        {(!isDraft || isModerator) && (
+          <div className="order-total">
+            <h4>Итого: {currentOrder?.total_cost?.toLocaleString() || 0} ₽</h4>
+          </div>
+        )}
 
         {isDraft && (
           <div className="order-actions">
@@ -319,6 +375,17 @@ export const OrderPage: React.FC = () => {
             </Button>
             <Button className="btn-delete" onClick={handleDelete}>
               Очистить заявку
+            </Button>
+          </div>
+        )}
+
+        {isModerator && currentOrder?.status === 'сформирован' && (
+          <div className="order-actions moderator-actions">
+            <Button className="btn-format" onClick={handleComplete}>
+              Завершить заявку
+            </Button>
+            <Button variant="outline-danger" className="btn-delete" onClick={handleReject}>
+              Отклонить заявку
             </Button>
           </div>
         )}

@@ -58,6 +58,14 @@
   gap: 24px;
 }
 
+.orders-filters {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
   .orders-grid {
     grid-template-columns: 1fr;

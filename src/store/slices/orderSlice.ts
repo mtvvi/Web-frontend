@@ -96,6 +96,32 @@ export const formatOrder = createAsyncThunk(
   }
 );
 
+// Завершение заявки (модератор)
+export const completeOrder = createAsyncThunk(
+  'order/completeOrder',
+  async (orderId: number, { rejectWithValue }) => {
+    try {
+      const response = await api.orders.completeUpdate(orderId);
+      return { orderId, data: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Ошибка завершения заявки');
+    }
+  }
+);
+
+// Отклонение заявки (модератор)
+export const rejectOrder = createAsyncThunk(
+  'order/rejectOrder',
+  async (orderId: number, { rejectWithValue }) => {
+    try {
+      const response = await api.orders.rejectUpdate(orderId);
+      return { orderId, data: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Ошибка отклонения заявки');
+    }
+  }
+);
+
 // Удаление услуги из заявки
 export const removeServiceFromOrder = createAsyncThunk(
   'order/removeServiceFromOrder',
@@ -174,7 +200,7 @@ const orderSlice = createSlice({
           state.orderFields = {
             users: action.payload.users ?? 0,
             cores: action.payload.cores ?? 0,
-            period: action.payload.period ?? 0,
+            period: action.payload.period ?? 1, // Минимум 1 месяц (валидация на бэкенде)
           };
         }
       })
@@ -206,7 +232,7 @@ const orderSlice = createSlice({
       .addCase(formatOrder.fulfilled, (state) => {
         state.isDraft = false;
         if (state.currentOrder) {
-          state.currentOrder.status = 'formatted';
+          state.currentOrder.status = 'сформирован';
         }
       })
       .addCase(formatOrder.rejected, (state, action) => {
@@ -227,6 +253,24 @@ const orderSlice = createSlice({
         }
       })
       .addCase(updateServiceSupportLevel.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      // completeOrder
+      .addCase(completeOrder.fulfilled, (state) => {
+        if (state.currentOrder) {
+          state.currentOrder.status = 'завершён';
+        }
+      })
+      .addCase(completeOrder.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      // rejectOrder
+      .addCase(rejectOrder.fulfilled, (state) => {
+        if (state.currentOrder) {
+          state.currentOrder.status = 'отклонён';
+        }
+      })
+      .addCase(rejectOrder.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

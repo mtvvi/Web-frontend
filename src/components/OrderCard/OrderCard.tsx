@@ -5,9 +5,10 @@ import './OrderCard.css';
 interface OrderCardProps {
   order: DtoOrderResponse;
   onClick: () => void;
+  showReady?: boolean;
 }
 
-export const OrderCard: React.FC<OrderCardProps> = ({ order, onClick }) => {
+export const OrderCard: React.FC<OrderCardProps> = ({ order, onClick, showReady }) => {
   const getStatusLabel = (status?: string) => {
     switch (status) {
       case 'черновик':
@@ -98,6 +99,12 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onClick }) => {
           <span className="param-label">мес.</span>
         </div>
       </div>
+
+      {showReady && typeof order.ready_services === 'number' && (
+        <div className="order-card-ready">
+          Готово: {order.ready_services}
+        </div>
+      )}
 
       <div className="order-card-footer">
         <div className="order-card-total">
