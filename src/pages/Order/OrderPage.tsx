@@ -13,6 +13,7 @@ import {
   rejectOrder,
   setOrderFields,
   clearError,
+  updateServiceSupportLevel,
 } from '../../store/slices/orderSlice';
 import { clearCart } from '../../store/slices/servicesSlice';
 import { BreadCrumbs } from '../../components/BreadCrumbs/BreadCrumbs';
@@ -151,6 +152,40 @@ export const OrderPage: React.FC = () => {
     }
   };
 
+  const handleSupportLevelChange = async (serviceId: number, delta: number) => {
+    if (!id || !isDraft || !serviceId) return;
+    
+    const service = services.find(s => s.id === serviceId);
+    if (!service) return;
+    
+    const currentLevel = service.support_level ?? 1;
+    const newLevel = Math.max(0.1, Math.round((currentLevel + delta) * 10) / 10);
+    
+    await dispatch(updateServiceSupportLevel({
+      orderId: Number(id),
+      serviceId,
+      supportLevel: newLevel,
+    }));
+    
+    dispatch(getOrderDetail(Number(id)));
+  };
+
+  const handleSaveFields = async () => {
+    if (id && isDraft) {
+      await dispatch(
+        updateOrderFields({
+          orderId: Number(id),
+          data: {
+            user_count: orderFields.users,
+            core_count: orderFields.cores,
+            period: orderFields.period,
+          },
+        })
+      );
+      dispatch(getOrderDetail(Number(id)));
+    }
+  };
+
   const getStatusLabel = (status?: string) => {
     switch (status) {
       case 'черновик':
@@ -273,9 +308,9 @@ export const OrderPage: React.FC = () => {
                 </Form.Group>
               </Col>
             </Row>
-            <div className="text-muted small">
-              * Период должен быть не менее 1 месяца. Параметры сохраняются автоматически при нажатии Enter или при переходе к следующему полю.
-            </div>
+            <Button className="btn-save" onClick={handleSaveFields}>
+              Сохранить поля заявки
+            </Button>
           </div>
         )}
 
@@ -312,8 +347,7 @@ export const OrderPage: React.FC = () => {
                   <th>Изображение</th>
                   <th>Название</th>
                   <th>Тип лицензии</th>
-                  {(!isDraft || isModerator) && <th>Базовая цена</th>}
-                  {(!isDraft || isModerator) && <th>Коэф. поддержки</th>}
+                  <th>Коэф. поддержки</th>
                   {(!isDraft || isModerator) && <th>Подытог</th>}
                   {isDraft && <th>Действия</th>}
                 </tr>
@@ -340,8 +374,32 @@ export const OrderPage: React.FC = () => {
                       </td>
                       <td>{service.name}</td>
                       <td>{service.license_type}</td>
-                      {(!isDraft || isModerator) && <td>{service.base_price?.toLocaleString()} ₽</td>}
-                      {(!isDraft || isModerator) && <td>{service.support_level ?? 1}</td>}
+                      {/* {(!isDraft || isModerator) && <td>{service.base_price?.toLocaleString()} ₽</td>} */}
+                      <td>
+                        {isDraft ? (
+                          <div className="d-flex align-items-center gap-2">
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => service.id && handleSupportLevelChange(service.id, -0.1)}
+                            >
+                              −
+                            </Button>
+                            <span className="fw-bold">{(service.support_level ?? 1).toFixed(1)}</span>
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => service.id && handleSupportLevelChange(service.id, 0.1)}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        ) : (
+                          <span>{service.support_level ?? 1}</span>
+                        )}
+                      </td>
+                      {/* {(!isDraft || isModerator) && <td>{service.base_price?.toLocaleString()} ₽</td>} */}
+                      {/* {(!isDraft || isModerator) && <td>{service.support_level ?? 1}</td>} */}
                       {(!isDraft || isModerator) && <td>{service.subtotal?.toLocaleString()} ₽</td>}
                       {isDraft && (
                         <td>

@@ -107,7 +107,7 @@ export default defineConfig(({ mode }) => {
     })
     ],
     server: {
-      https: {},
+      https: env.VITE_ENABLE_HTTPS === 'true' ? {} : false,
       proxy: {
         "/api": {
           target: env.VITE_API_URL || "http://localhost:8080",
@@ -130,7 +130,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
     },
     preview: {
-      https: {},
+      https: env.VITE_ENABLE_HTTPS === 'true' ? {} : false,
     },
   }
 })
