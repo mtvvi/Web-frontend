@@ -337,7 +337,7 @@ export const OrderPage: React.FC = () => {
         )}
 
         <div className="order-services">
-          <h4>Услуги в заявке</h4>
+          <h4>Лицензии в заявке</h4>
           {services.length === 0 ? (
             <p className="no-services">Услуги не добавлены</p>
           ) : (

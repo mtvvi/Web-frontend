@@ -35,7 +35,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ isLoading }) => {
   return (
     <section className="filters-panel" aria-label="Фильтры подборки услуг">
       <div className="filter-field full-width">
-        <label htmlFor="name-filter">Название услуги</label>
+        <label htmlFor="name-filter">Название лицензии</label>
         <input
           id="name-filter"
           type="text"

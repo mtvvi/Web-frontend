@@ -11,10 +11,10 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  username: localStorage.getItem('username') || '',
-  role: localStorage.getItem('role') ? Number(localStorage.getItem('role')) : null,
-  isAuthenticated: !!localStorage.getItem('token'),
-  isModerator: localStorage.getItem('role') ? Number(localStorage.getItem('role')) >= 2 : false,
+  username: '',
+  role: null,
+  isAuthenticated: false,
+  isModerator: false,
   loading: false,
   error: null,
 };

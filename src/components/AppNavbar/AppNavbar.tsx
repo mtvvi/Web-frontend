@@ -20,10 +20,6 @@ export const AppNavbar: React.FC = () => {
   const { cartOrderId, cartCount } = useSelector((state: RootState) => state.services);
 
   useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
-
-  useEffect(() => {
     if (isAuthenticated) {
       dispatch(getCartInfo());
     }
@@ -71,7 +67,7 @@ export const AppNavbar: React.FC = () => {
           onClick={closeMenu}
           className={({ isActive }) => (isActive ? "active" : undefined)}
         >
-          Услуги
+          Лицензии
         </NavLink>
         
         {isAuthenticated && (

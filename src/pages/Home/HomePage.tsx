@@ -29,9 +29,7 @@ export const HomePage: React.FC = () => {
           </p>
           
           <div className="home-cta">
-            <Link to={ROUTES.SERVICES} className="home-button">
-              Просмотреть лицензии
-            </Link>
+            
           </div>
         </div>
 

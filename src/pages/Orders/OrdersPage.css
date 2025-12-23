@@ -51,11 +51,11 @@
   color: #333;
 }
 
-/* Grid для карточек заявок */
+/* Список заявок в 1 столбец */
 .orders-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .orders-filters {
