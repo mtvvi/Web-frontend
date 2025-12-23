@@ -5,11 +5,21 @@
     <title>Redirecting...</title>
     <script>
       (function () {
-        const segments = window.location.pathname.split('/').filter(Boolean);
-        const base = segments.length ? `/${segments[0]}/` : '/';
-        const redirectPath = window.location.pathname.replace(base, '') + window.location.search + window.location.hash;
-        sessionStorage.setItem('redirect', redirectPath);
-        window.location.replace(base);
+        var repoSegment = 'Web-frontend';
+        var segments = window.location.pathname.split('/').filter(Boolean);
+        var hasRepo = segments[0] === repoSegment;
+        var redirectSegments = hasRepo ? segments.slice(1) : segments;
+        var redirectPath = '/' + redirectSegments.join('/');
+        if (redirectPath === '//') {
+          redirectPath = '/';
+        }
+
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+        sessionStorage.setItem('redirect', redirectPath + search + hash);
+
+        var repoBase = '/' + repoSegment + '/';
+        window.location.replace(repoBase);
       })();
     </script>
   </head>
