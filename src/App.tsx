@@ -6,8 +6,8 @@ import { ServiceDetailPage } from "./pages/ServiceDetail/ServiceDetailPage";
 import { LoginPage } from "./pages/Login/LoginPage";
 import { RegistrationPage } from "./pages/Registration/RegistrationPage";
 import { ProfilePage } from "./pages/Profile/ProfilePage";
-import { OrdersPage } from "./pages/Orders/OrdersPage";
-import { OrderPage } from "./pages/Order/OrderPage";
+import { LicenseCalculationRequestsPage } from "./pages/LicenseCalculationRequests/LicenseCalculationRequestsPage";
+import { LicenseCalculationRequestPage } from "./pages/LicenseCalculationRequest/LicenseCalculationRequestPage";
 import { ROUTES } from "./Routes";
 import "./App.css";
 
@@ -22,8 +22,8 @@ function App() {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.REGISTER} element={<RegistrationPage />} />
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
-        <Route path={ROUTES.ORDERS} element={<OrdersPage />} />
-        <Route path={`${ROUTES.ORDER}/:id`} element={<OrderPage />} />
+        <Route path={ROUTES.ORDERS} element={<LicenseCalculationRequestsPage />} />
+        <Route path={`${ROUTES.ORDER}/:id`} element={<LicenseCalculationRequestPage />} />
       </Routes>
     </>
   );

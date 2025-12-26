@@ -9,7 +9,7 @@ interface ServicesState {
   services: DtoServiceResponse[];
   loading: boolean;
   error: string | null;
-  cartOrderId: number | null;
+  cartLicenseCalculationRequestId: number | null;
   cartCount: number;
 }
 
@@ -18,7 +18,7 @@ const initialState: ServicesState = {
   services: [],
   loading: false,
   error: null,
-  cartOrderId: null,
+  cartLicenseCalculationRequestId: null,
   cartCount: 0,
 };
 
@@ -43,11 +43,11 @@ export const getCartInfo = createAsyncThunk(
   'services/getCartInfo',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.orders.cartList();
+      const response = await api.licenseCalculationRequests.cartList();
       return response.data;
     } catch (error: any) {
       if (error.response?.status === 404) {
-        return { order_id: null, service_count: 0 };
+        return { licenseCalculationRequest_id: null, service_count: 0 };
       }
       return rejectWithValue('Ошибка получения корзины');
     }
@@ -55,11 +55,11 @@ export const getCartInfo = createAsyncThunk(
 );
 
 // Добавление услуги в заявку
-export const addServiceToOrder = createAsyncThunk(
-  'services/addServiceToOrder',
+export const addServiceToLicenseCalculationRequest = createAsyncThunk(
+  'services/addServiceToLicenseCalculationRequest',
   async (serviceId: number, { dispatch, rejectWithValue }) => {
     try {
-      const response = await api.services.addToOrderCreate(serviceId);
+      const response = await api.services.addToLicenseCalculationRequestCreate(serviceId);
       dispatch(getCartInfo());
       return response.data;
     } catch (error: any) {
@@ -76,7 +76,7 @@ const servicesSlice = createSlice({
       state.searchValue = action.payload;
     },
     clearCart(state) {
-      state.cartOrderId = null;
+      state.cartLicenseCalculationRequestId = null;
       state.cartCount = 0;
     },
   },
@@ -102,15 +102,15 @@ const servicesSlice = createSlice({
       })
       // getCartInfo
       .addCase(getCartInfo.fulfilled, (state, action) => {
-        state.cartOrderId = action.payload.order_id || null;
+        state.cartLicenseCalculationRequestId = action.payload.licenseCalculationRequest_id || null;
         state.cartCount = action.payload.service_count || 0;
       })
       .addCase(getCartInfo.rejected, (state) => {
-        state.cartOrderId = null;
+        state.cartLicenseCalculationRequestId = null;
         state.cartCount = 0;
       })
-      // addServiceToOrder
-      .addCase(addServiceToOrder.rejected, (state, action) => {
+      // addServiceToLicenseCalculationRequest
+      .addCase(addServiceToLicenseCalculationRequest.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

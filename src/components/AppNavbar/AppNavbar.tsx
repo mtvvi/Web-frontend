@@ -17,7 +17,7 @@ export const AppNavbar: React.FC = () => {
   const navigate = useNavigate();
   
   const { isAuthenticated, username } = useSelector((state: RootState) => state.user);
-  const { cartOrderId, cartCount } = useSelector((state: RootState) => state.services);
+  const { cartLicenseCalculationRequestId, cartCount } = useSelector((state: RootState) => state.services);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -37,8 +37,8 @@ export const AppNavbar: React.FC = () => {
   };
 
   const handleCartClick = () => {
-    if (cartOrderId) {
-      navigate(`${ROUTES.ORDER}/${cartOrderId}`);
+    if (cartLicenseCalculationRequestId) {
+      navigate(`${ROUTES.ORDER}/${cartLicenseCalculationRequestId}`);
     }
     closeMenu();
   };

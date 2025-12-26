@@ -60,11 +60,11 @@ export interface DtoServiceListResponse {
 }
 
 export interface DtoCartResponse {
-  order_id?: number;
+  licenseCalculationRequest_id?: number;
   service_count?: number;
 }
 
-export interface DtoServiceInOrderResp {
+export interface DtoServiceInLicenseCalculationRequestResp {
   base_price?: number;
   description?: string;
   id?: number;
@@ -75,7 +75,7 @@ export interface DtoServiceInOrderResp {
   support_level?: number;
 }
 
-export interface DtoOrderResponse {
+export interface DtoLicenseCalculationRequestResponse {
   completed_at?: string;
   cores?: number;
   created_at?: string;
@@ -84,25 +84,25 @@ export interface DtoOrderResponse {
   id?: number;
   moderator?: string;
   period?: number;
-  services?: DtoServiceInOrderResp[];
+  services?: DtoServiceInLicenseCalculationRequestResp[];
   status?: string;
   total_cost?: number;
   users?: number;
   ready_services?: number;
 }
 
-export interface DtoOrderListResponse {
-  orders?: DtoOrderResponse[];
+export interface DtoLicenseCalculationRequestListResponse {
+  licenseCalculationRequests?: DtoLicenseCalculationRequestResponse[];
   total?: number;
 }
 
-export interface DtoUpdateOrderFieldsRequest {
+export interface DtoUpdateLicenseCalculationRequestFieldsRequest {
   core_count?: number;
   period?: number;
   user_count?: number;
 }
 
-export interface DtoUpdateOrderServiceRequest {
+export interface DtoUpdateLicenseCalculationRequestServiceRequest {
   support_level: number;
 }
 
@@ -281,21 +281,21 @@ export class Api extends HttpClient {
     /**
      * @description Добавляет услугу в черновик заявки
      */
-    addToOrderCreate: (id: number) =>
+    addToLicenseCalculationRequestCreate: (id: number) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/services/${id}/add-to-order`,
+        path: `/api/services/${id}/add-to-licenseCalculationRequest`,
         method: "POST",
         format: "json",
       }),
   };
 
-  orders = {
+  licenseCalculationRequests = {
     /**
      * @description Возвращает количество услуг в черновике заявки
      */
     cartList: () =>
       this.request<DtoCartResponse>({
-        path: `/api/orders/cart`,
+        path: `/api/licenseCalculationRequests/cart`,
         method: "GET",
         format: "json",
       }),
@@ -303,9 +303,9 @@ export class Api extends HttpClient {
     /**
      * @description Возвращает список заявок
      */
-    ordersList: (query?: { status?: string; date_from?: string; date_to?: string }) =>
-      this.request<DtoOrderListResponse>({
-        path: `/api/orders`,
+    licenseCalculationRequestsList: (query?: { status?: string; date_from?: string; date_to?: string }) =>
+      this.request<DtoLicenseCalculationRequestListResponse>({
+        path: `/api/licenseCalculationRequests`,
         method: "GET",
         query: query,
         format: "json",
@@ -314,9 +314,9 @@ export class Api extends HttpClient {
     /**
      * @description Возвращает детальную информацию о заявке
      */
-    ordersDetail: (id: number) =>
-      this.request<DtoOrderResponse>({
-        path: `/api/orders/${id}`,
+    licenseCalculationRequestsDetail: (id: number) =>
+      this.request<DtoLicenseCalculationRequestResponse>({
+        path: `/api/licenseCalculationRequests/${id}`,
         method: "GET",
         format: "json",
       }),
@@ -324,9 +324,9 @@ export class Api extends HttpClient {
     /**
      * @description Обновляет поля заявки
      */
-    ordersUpdate: (id: number, data: DtoUpdateOrderFieldsRequest) =>
+    licenseCalculationRequestsUpdate: (id: number, data: DtoUpdateLicenseCalculationRequestFieldsRequest) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/orders/${id}`,
+        path: `/api/licenseCalculationRequests/${id}`,
         method: "PUT",
         body: data,
         type: ContentType.Json,
@@ -336,9 +336,9 @@ export class Api extends HttpClient {
     /**
      * @description Удаляет заявку
      */
-    ordersDelete: (id: number) =>
+    licenseCalculationRequestsDelete: (id: number) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/orders/${id}`,
+        path: `/api/licenseCalculationRequests/${id}`,
         method: "DELETE",
         format: "json",
       }),
@@ -348,7 +348,7 @@ export class Api extends HttpClient {
      */
     formatUpdate: (id: number) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/orders/${id}/format`,
+        path: `/api/licenseCalculationRequests/${id}/format`,
         method: "PUT",
         format: "json",
       }),
@@ -358,7 +358,7 @@ export class Api extends HttpClient {
      */
     completeUpdate: (id: number) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/orders/${id}/complete`,
+        path: `/api/licenseCalculationRequests/${id}/complete`,
         method: "PUT",
         format: "json",
       }),
@@ -368,19 +368,19 @@ export class Api extends HttpClient {
      */
     rejectUpdate: (id: number) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/orders/${id}/reject`,
+        path: `/api/licenseCalculationRequests/${id}/reject`,
         method: "PUT",
         format: "json",
       }),
   };
 
-  orderServices = {
+  licenseCalculationRequestServices = {
     /**
      * @description Удаляет услугу из заявки
      */
-    deleteService: (orderId: number, serviceId: number) =>
+    deleteService: (licenseCalculationRequestId: number, serviceId: number) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/order-services/${orderId}/${serviceId}`,
+        path: `/api/licenseCalculationRequest-services/${licenseCalculationRequestId}/${serviceId}`,
         method: "DELETE",
         format: "json",
       }),
@@ -388,9 +388,9 @@ export class Api extends HttpClient {
     /**
      * @description Изменяет коэффициент поддержки для услуги
      */
-    updateService: (orderId: number, serviceId: number, data: DtoUpdateOrderServiceRequest) =>
+    updateService: (licenseCalculationRequestId: number, serviceId: number, data: DtoUpdateLicenseCalculationRequestServiceRequest) =>
       this.request<DtoSuccessResponse>({
-        path: `/api/order-services/${orderId}/${serviceId}`,
+        path: `/api/licenseCalculationRequest-services/${licenseCalculationRequestId}/${serviceId}`,
         method: "PUT",
         body: data,
         type: ContentType.Json,

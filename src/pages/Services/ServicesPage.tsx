@@ -14,7 +14,7 @@ import { selectAppliedFilters } from "../../features/filters/filtersSlice";
 import { useDesktopBridge } from "../../hooks/useDesktopBridge";
 import { resolvePublicAsset } from "../../utils/assets";
 import type { AppDispatch, RootState } from "../../store";
-import { addServiceToOrder, getCartInfo } from "../../store/slices/servicesSlice";
+import { addServiceToLicenseCalculationRequest, getCartInfo } from "../../store/slices/servicesSlice";
 import "./ServicesPage.css";
 
 export const ServicesPage: React.FC = () => {
@@ -28,7 +28,7 @@ export const ServicesPage: React.FC = () => {
   const appliedFilters = useAppSelector(selectAppliedFilters);
   
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
-  const { cartOrderId, cartCount } = useSelector((state: RootState) => state.services);
+  const { cartLicenseCalculationRequestId, cartCount } = useSelector((state: RootState) => state.services);
 
   const filterPayload = useMemo<ServiceFilterPayload>(() => {
     const payload: ServiceFilterPayload = {};
@@ -113,7 +113,7 @@ export const ServicesPage: React.FC = () => {
       return;
     }
     try {
-      await dispatch(addServiceToOrder(serviceId)).unwrap();
+      await dispatch(addServiceToLicenseCalculationRequest(serviceId)).unwrap();
       setCartError(null);
     } catch (err) {
       console.error("addToCart error", err);
@@ -122,8 +122,8 @@ export const ServicesPage: React.FC = () => {
   };
 
   const handleCartClick = () => {
-    if (cartOrderId) {
-      navigate(`${ROUTES.ORDER}/${cartOrderId}`);
+    if (cartLicenseCalculationRequestId) {
+      navigate(`${ROUTES.ORDER}/${cartLicenseCalculationRequestId}`);
     }
   };
 
@@ -132,10 +132,10 @@ export const ServicesPage: React.FC = () => {
       <div className="services-shell">
         <aside className="page-cart-rail" aria-label="Корзина">
           <div 
-            className={`page-cart-icon ${cartOrderId ? 'clickable' : ''}`} 
-            title={cartOrderId ? "Перейти к заявке" : "Корзина пуста"}
+            className={`page-cart-icon ${cartLicenseCalculationRequestId ? 'clickable' : ''}`} 
+            title={cartLicenseCalculationRequestId ? "Перейти к заявке" : "Корзина пуста"}
             onClick={handleCartClick}
-            style={{ cursor: cartOrderId ? 'pointer' : 'default' }}
+            style={{ cursor: cartLicenseCalculationRequestId ? 'pointer' : 'default' }}
           >
             <img src={resolvePublicAsset("cart.png")} alt="Корзина" />
             <div className="cart-counter">{isAuthenticated ? cartCount : 0}</div>
@@ -170,7 +170,7 @@ export const ServicesPage: React.FC = () => {
               </div>
             ) : !services.length ? (
               <div className="no-services">
-                <h3>Услуги не найдены</h3>
+                <h3>Лицензии не найдены</h3>
                 <p>Попробуйте изменить параметры поиска</p>
               </div>
             ) : (

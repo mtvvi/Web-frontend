@@ -1,10 +1,10 @@
-.order-page {
+.licenseCalculationRequest-page {
   min-height: calc(100vh - 80px);
   padding: 40px 20px;
   background: #f5f5f5;
 }
 
-.order-container {
+.licenseCalculationRequest-container {
   max-width: 1000px;
   background: #fff;
   border-radius: 16px;
@@ -21,7 +21,7 @@
   min-height: 300px;
 }
 
-.order-header {
+.licenseCalculationRequest-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,19 +30,19 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.order-header h2 {
+.licenseCalculationRequest-header h2 {
   color: #333;
   margin: 0;
 }
 
-.order-ready {
+.licenseCalculationRequest-ready {
   margin-top: -10px;
   margin-bottom: 20px;
   color: #2e7d32;
   font-weight: 600;
 }
 
-.order-status {
+.licenseCalculationRequest-status {
   padding: 8px 16px;
   border-radius: 20px;
   font-weight: 600;
@@ -73,20 +73,20 @@
   color: #721c24;
 }
 
-.order-info {
+.licenseCalculationRequest-info {
   margin-bottom: 30px;
 }
 
-.order-info p {
+.licenseCalculationRequest-info p {
   color: #666;
   margin: 5px 0;
 }
 
-.order-info strong {
+.licenseCalculationRequest-info strong {
   color: #333;
 }
 
-.order-fields {
+.licenseCalculationRequest-fields {
   background: #fafafa;
   padding: 20px;
   border-radius: 12px;
@@ -94,29 +94,29 @@
   border: 1px solid #e0e0e0;
 }
 
-.order-fields h4 {
+.licenseCalculationRequest-fields h4 {
   color: #333;
   margin-bottom: 20px;
 }
 
-.order-fields .form-label {
+.licenseCalculationRequest-fields .form-label {
   color: #555;
 }
 
-.order-fields .form-control {
+.licenseCalculationRequest-fields .form-control {
   background: #fff;
   border: 1px solid #ccc;
   color: #333;
 }
 
-.order-fields .form-control:focus {
+.licenseCalculationRequest-fields .form-control:focus {
   background: #fff;
   border-color: #FFCD00;
   box-shadow: 0 0 0 0.2rem rgba(255, 205, 0, 0.25);
   color: #333;
 }
 
-.order-params {
+.licenseCalculationRequest-params {
   background: #fafafa;
   padding: 15px 20px;
   border-radius: 12px;
@@ -124,16 +124,16 @@
   border: 1px solid #e0e0e0;
 }
 
-.order-params p {
+.licenseCalculationRequest-params p {
   color: #333;
   margin: 5px 0;
 }
 
-.order-services {
+.licenseCalculationRequest-services {
   margin-bottom: 30px;
 }
 
-.order-services h4 {
+.licenseCalculationRequest-services h4 {
   color: #333;
   margin-bottom: 20px;
 }
@@ -179,7 +179,7 @@
   color: #333;
 }
 
-.order-total {
+.licenseCalculationRequest-total {
   text-align: right;
   padding: 20px;
   background: #fff8e1;
@@ -188,12 +188,12 @@
   border: 1px solid #ffe082;
 }
 
-.order-total h4 {
+.licenseCalculationRequest-total h4 {
   color: #333;
   margin: 0;
 }
 
-.order-actions {
+.licenseCalculationRequest-actions {
   display: flex;
   gap: 15px;
   justify-content: flex-end;

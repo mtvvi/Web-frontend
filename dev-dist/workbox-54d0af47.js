@@ -1673,7 +1673,7 @@ define(['exports'], (function (exports) { 'use strict';
       https://opensource.org/licenses/MIT.
     */
     /**
-     * Runs all of the callback functions, one at a time sequentially, in the order
+     * Runs all of the callback functions, one at a time sequentially, in the licenseCalculationRequest
      * in which they were registered.
      *
      * @memberof workbox-core
@@ -2082,7 +2082,7 @@ define(['exports'], (function (exports) { 'use strict';
         return false;
       }
       /**
-       * Runs all plugin callbacks matching the given name, in order, passing the
+       * Runs all plugin callbacks matching the given name, in licenseCalculationRequest, passing the
        * given param object (merged ith the current plugin state) as the only
        * argument.
        *

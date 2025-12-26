@@ -4,30 +4,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { AppDispatch, RootState } from '../../store';
 import {
-  getOrderDetail,
-  updateOrderFields,
-  deleteOrder,
-  formatOrder,
-  removeServiceFromOrder,
-  completeOrder,
-  rejectOrder,
-  setOrderFields,
+  getLicenseCalculationRequestDetail,
+  updateLicenseCalculationRequestFields,
+  deleteLicenseCalculationRequest,
+  formatLicenseCalculationRequest,
+  removeServiceFromLicenseCalculationRequest,
+  completeLicenseCalculationRequest,
+  rejectLicenseCalculationRequest,
+  setLicenseCalculationRequestFields,
   clearError,
   updateServiceSupportLevel,
-} from '../../store/slices/orderSlice';
+} from '../../store/slices/licenseCalculationRequestSlice';
 import { clearCart } from '../../store/slices/servicesSlice';
 import { BreadCrumbs } from '../../components/BreadCrumbs/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from '../../Routes';
 import { resolvePublicAsset } from '../../utils/assets';
-import './OrderPage.css';
+import './LicenseCalculationRequestPage.css';
 
-export const OrderPage: React.FC = () => {
+export const LicenseCalculationRequestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { currentOrder, services, loading, error, isDraft, orderFields } = useSelector(
-    (state: RootState) => state.order
+  const { currentLicenseCalculationRequest, services, loading, error, isDraft, licenseCalculationRequestFields } = useSelector(
+    (state: RootState) => state.licenseCalculationRequest
   );
   const { isAuthenticated, isModerator } = useSelector((state: RootState) => state.user);
 
@@ -40,18 +40,18 @@ export const OrderPage: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(getOrderDetail(Number(id)));
+      dispatch(getLicenseCalculationRequestDetail(Number(id)));
     }
   }, [dispatch, id]);
 
   // Синхронизируем локальные поля с Redux при загрузке заказа
   useEffect(() => {
     setLocalFields({
-      users: String(orderFields.users),
-      cores: String(orderFields.cores),
-      period: String(orderFields.period),
+      users: String(licenseCalculationRequestFields.users),
+      cores: String(licenseCalculationRequestFields.cores),
+      period: String(licenseCalculationRequestFields.period),
     });
-  }, [orderFields.users, orderFields.cores, orderFields.period]);
+  }, [licenseCalculationRequestFields.users, licenseCalculationRequestFields.cores, licenseCalculationRequestFields.period]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -61,15 +61,15 @@ export const OrderPage: React.FC = () => {
 
   // Шорт-поллинг деталки после завершения для подтяжки async sub_total
   useEffect(() => {
-    if (!id || !currentOrder) return undefined;
-    if (currentOrder.status !== 'завершён') return undefined;
+    if (!id || !currentLicenseCalculationRequest) return undefined;
+    if (currentLicenseCalculationRequest.status !== 'завершён') return undefined;
 
     const interval = setInterval(() => {
-      dispatch(getOrderDetail(Number(id)));
+      dispatch(getLicenseCalculationRequestDetail(Number(id)));
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [dispatch, id, currentOrder]);
+  }, [dispatch, id, currentLicenseCalculationRequest]);
 
   const handleFieldChange = (field: 'users' | 'cores' | 'period', value: string) => {
     // Убираем ведущие нули (например, "01" -> "1", но "0" остается "0")
@@ -84,15 +84,15 @@ export const OrderPage: React.FC = () => {
   const handleFieldBlur = (field: 'users' | 'cores' | 'period') => {
     // При потере фокуса конвертируем в число и обновляем Redux
     const numValue = localFields[field] === '' ? 0 : Number(localFields[field]);
-    dispatch(setOrderFields({ [field]: numValue }));
+    dispatch(setLicenseCalculationRequestFields({ [field]: numValue }));
     setLocalFields((prev) => ({ ...prev, [field]: String(numValue) }));
     
     // Автосохранение при потере фокуса - только если значения валидны
     if (id && isDraft) {
       const updatedFields = {
-        user_count: field === 'users' ? numValue : orderFields.users,
-        core_count: field === 'cores' ? numValue : orderFields.cores,
-        period: field === 'period' ? numValue : orderFields.period,
+        user_count: field === 'users' ? numValue : licenseCalculationRequestFields.users,
+        core_count: field === 'cores' ? numValue : licenseCalculationRequestFields.cores,
+        period: field === 'period' ? numValue : licenseCalculationRequestFields.period,
       };
       
       // Не отправляем если period < 1 (валидация на бэкенде требует >= 1)
@@ -101,8 +101,8 @@ export const OrderPage: React.FC = () => {
       }
       
       dispatch(
-        updateOrderFields({
-          orderId: Number(id),
+        updateLicenseCalculationRequestFields({
+          licenseCalculationRequestId: Number(id),
           data: updatedFields,
         })
       );
@@ -118,7 +118,7 @@ export const OrderPage: React.FC = () => {
 
   const handleDelete = async () => {
     if (id && isDraft) {
-      await dispatch(deleteOrder(Number(id)));
+      await dispatch(deleteLicenseCalculationRequest(Number(id)));
       dispatch(clearCart());
       navigate(ROUTES.SERVICES);
     }
@@ -126,29 +126,29 @@ export const OrderPage: React.FC = () => {
 
   const handleFormat = async () => {
     if (id && isDraft) {
-      await dispatch(formatOrder(Number(id)));
+      await dispatch(formatLicenseCalculationRequest(Number(id)));
       dispatch(clearCart());
       navigate(ROUTES.ORDERS);
     }
   };
 
   const handleComplete = async () => {
-    if (id && currentOrder?.status === 'сформирован') {
-      await dispatch(completeOrder(Number(id)));
-      dispatch(getOrderDetail(Number(id)));
+    if (id && currentLicenseCalculationRequest?.status === 'сформирован') {
+      await dispatch(completeLicenseCalculationRequest(Number(id)));
+      dispatch(getLicenseCalculationRequestDetail(Number(id)));
     }
   };
 
   const handleReject = async () => {
-    if (id && currentOrder?.status === 'сформирован') {
-      await dispatch(rejectOrder(Number(id)));
-      dispatch(getOrderDetail(Number(id)));
+    if (id && currentLicenseCalculationRequest?.status === 'сформирован') {
+      await dispatch(rejectLicenseCalculationRequest(Number(id)));
+      dispatch(getLicenseCalculationRequestDetail(Number(id)));
     }
   };
 
   const handleRemoveService = async (serviceId: number) => {
     if (id && isDraft && serviceId) {
-      await dispatch(removeServiceFromOrder({ orderId: Number(id), serviceId }));
+      await dispatch(removeServiceFromLicenseCalculationRequest({ licenseCalculationRequestId: Number(id), serviceId }));
     }
   };
 
@@ -162,27 +162,27 @@ export const OrderPage: React.FC = () => {
     const newLevel = Math.max(0.1, Math.round((currentLevel + delta) * 10) / 10);
     
     await dispatch(updateServiceSupportLevel({
-      orderId: Number(id),
+      licenseCalculationRequestId: Number(id),
       serviceId,
       supportLevel: newLevel,
     }));
     
-    dispatch(getOrderDetail(Number(id)));
+    dispatch(getLicenseCalculationRequestDetail(Number(id)));
   };
 
   const handleSaveFields = async () => {
     if (id && isDraft) {
       await dispatch(
-        updateOrderFields({
-          orderId: Number(id),
+        updateLicenseCalculationRequestFields({
+          licenseCalculationRequestId: Number(id),
           data: {
-            user_count: orderFields.users,
-            core_count: orderFields.cores,
-            period: orderFields.period,
+            user_count: licenseCalculationRequestFields.users,
+            core_count: licenseCalculationRequestFields.cores,
+            period: licenseCalculationRequestFields.period,
           },
         })
       );
-      dispatch(getOrderDetail(Number(id)));
+      dispatch(getLicenseCalculationRequestDetail(Number(id)));
     }
   };
 
@@ -206,7 +206,7 @@ export const OrderPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="order-page">
+      <div className="licenseCalculationRequest-page">
         <Container className="loading-container">
           <Spinner animation="border" />
         </Container>
@@ -215,7 +215,7 @@ export const OrderPage: React.FC = () => {
   }
 
   return (
-    <div className="order-page">
+    <div className="licenseCalculationRequest-page">
       <BreadCrumbs
         crumbs={[
           { label: ROUTE_LABELS.ORDERS, path: ROUTES.ORDERS },
@@ -223,49 +223,49 @@ export const OrderPage: React.FC = () => {
         ]}
       />
 
-      <Container className="order-container">
+      <Container className="licenseCalculationRequest-container">
         {error && (
           <Alert variant="danger" onClose={() => dispatch(clearError())} dismissible>
             {error}
           </Alert>
         )}
 
-        <div className="order-header">
-          <h2>Заявка #{currentOrder?.id}</h2>
-          <span className={`order-status status-${currentOrder?.status}`}>
-            {getStatusLabel(currentOrder?.status)}
+        <div className="licenseCalculationRequest-header">
+          <h2>Заявка #{currentLicenseCalculationRequest?.id}</h2>
+          <span className={`licenseCalculationRequest-status status-${currentLicenseCalculationRequest?.status}`}>
+            {getStatusLabel(currentLicenseCalculationRequest?.status)}
           </span>
         </div>
 
-        {typeof currentOrder?.ready_services === 'number' && (
-          <div className="order-ready">
-            Рассчитано услуг: {currentOrder.ready_services}
+        {typeof currentLicenseCalculationRequest?.ready_services === 'number' && (
+          <div className="licenseCalculationRequest-ready">
+            Рассчитано услуг: {currentLicenseCalculationRequest.ready_services}
           </div>
         )}
 
-        <div className="order-info">
+        <div className="licenseCalculationRequest-info">
           <p>
             <strong>Создана:</strong>{' '}
-            {currentOrder?.created_at
-              ? new Date(currentOrder.created_at).toLocaleDateString('ru-RU')
+            {currentLicenseCalculationRequest?.created_at
+              ? new Date(currentLicenseCalculationRequest.created_at).toLocaleDateString('ru-RU')
               : '—'}
           </p>
-          {currentOrder?.formatted_at && (
+          {currentLicenseCalculationRequest?.formatted_at && (
             <p>
               <strong>Сформирована:</strong>{' '}
-              {new Date(currentOrder.formatted_at).toLocaleDateString('ru-RU')}
+              {new Date(currentLicenseCalculationRequest.formatted_at).toLocaleDateString('ru-RU')}
             </p>
           )}
-          {currentOrder?.completed_at && (
+          {currentLicenseCalculationRequest?.completed_at && (
             <p>
               <strong>Завершена:</strong>{' '}
-              {new Date(currentOrder.completed_at).toLocaleDateString('ru-RU')}
+              {new Date(currentLicenseCalculationRequest.completed_at).toLocaleDateString('ru-RU')}
             </p>
           )}
         </div>
 
         {isDraft && (
-          <div className="order-fields">
+          <div className="licenseCalculationRequest-fields">
             <h4>Параметры расчета</h4>
             <Row>
               <Col md={4}>
@@ -314,32 +314,32 @@ export const OrderPage: React.FC = () => {
           </div>
         )}
 
-        {!isDraft && currentOrder && (
-          <div className="order-params">
+        {!isDraft && currentLicenseCalculationRequest && (
+          <div className="licenseCalculationRequest-params">
             <Row>
               <Col md={4}>
                 <p>
-                  <strong>Пользователей:</strong> {currentOrder.users}
+                  <strong>Пользователей:</strong> {currentLicenseCalculationRequest.users}
                 </p>
               </Col>
               <Col md={4}>
                 <p>
-                  <strong>Ядер:</strong> {currentOrder.cores}
+                  <strong>Ядер:</strong> {currentLicenseCalculationRequest.cores}
                 </p>
               </Col>
               <Col md={4}>
                 <p>
-                  <strong>Период:</strong> {currentOrder.period} мес.
+                  <strong>Период:</strong> {currentLicenseCalculationRequest.period} мес.
                 </p>
               </Col>
             </Row>
           </div>
         )}
 
-        <div className="order-services">
+        <div className="licenseCalculationRequest-services">
           <h4>Лицензии в заявке</h4>
           {services.length === 0 ? (
-            <p className="no-services">Услуги не добавлены</p>
+            <p className="no-services">Лицензии не добавлены</p>
           ) : (
             <Table responsive className="services-table">
               <thead>
@@ -421,13 +421,13 @@ export const OrderPage: React.FC = () => {
         </div>
 
         {(!isDraft || isModerator) && (
-          <div className="order-total">
-            <h4>Итого: {currentOrder?.total_cost?.toLocaleString() || 0} ₽</h4>
+          <div className="licenseCalculationRequest-total">
+            <h4>Итого: {currentLicenseCalculationRequest?.total_cost?.toLocaleString() || 0} ₽</h4>
           </div>
         )}
 
         {isDraft && (
-          <div className="order-actions">
+          <div className="licenseCalculationRequest-actions">
             <Button className="btn-format" onClick={handleFormat} disabled={services.length === 0}>
               Сформировать заявку
             </Button>
@@ -437,8 +437,8 @@ export const OrderPage: React.FC = () => {
           </div>
         )}
 
-        {isModerator && currentOrder?.status === 'сформирован' && (
-          <div className="order-actions moderator-actions">
+        {isModerator && currentLicenseCalculationRequest?.status === 'сформирован' && (
+          <div className="licenseCalculationRequest-actions moderator-actions">
             <Button className="btn-format" onClick={handleComplete}>
               Завершить заявку
             </Button>
@@ -452,4 +452,4 @@ export const OrderPage: React.FC = () => {
   );
 };
 
-export default OrderPage;
+export default LicenseCalculationRequestPage;

@@ -3,22 +3,28 @@ import { Container, Spinner, Alert, Button, Row, Col, Form } from 'react-bootstr
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import type { AppDispatch, RootState } from '../../store';
-import { getOrdersList, clearError } from '../../store/slices/orderSlice';
+import { getLicenseCalculationRequestsList, clearError } from '../../store/slices/licenseCalculationRequestSlice';
 import { BreadCrumbs } from '../../components/BreadCrumbs/BreadCrumbs';
-import { OrderCard } from '../../components/OrderCard/OrderCard';
+import { LicenseCalculationRequestCard } from '../../components/LicenseCalculationRequestCard/LicenseCalculationRequestCard';
 import { ROUTES, ROUTE_LABELS } from '../../Routes';
-import './OrdersPage.css';
+import './LicenseCalculationRequestsPage.css';
 
-export const OrdersPage: React.FC = () => {
+export const LicenseCalculationRequestsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { orders, loading, error } = useSelector((state: RootState) => state.order);
+  const { licenseCalculationRequests, loading, error } = useSelector((state: RootState) => state.licenseCalculationRequest);
   const { isAuthenticated, isModerator } = useSelector((state: RootState) => state.user);
 
+  // Получаем сегодняшнюю дату в формате YYYY-MM-DD
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
   const [statusFilter, setStatusFilter] = useState<string>('');
-  const [dateFrom, setDateFrom] = useState<string>('');
-  const [dateTo, setDateTo] = useState<string>('');
+  const [dateFrom, setDateFrom] = useState<string>(getTodayDate());
+  const [dateTo, setDateTo] = useState<string>(getTodayDate());
 
   const buildFilters = useMemo(
     () => () => {
@@ -33,7 +39,7 @@ export const OrdersPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(getOrdersList(buildFilters()));
+      dispatch(getLicenseCalculationRequestsList(buildFilters()));
     }
   }, [dispatch, isAuthenticated, buildFilters]);
 
@@ -42,7 +48,7 @@ export const OrdersPage: React.FC = () => {
     if (!isAuthenticated || !isModerator) return undefined;
     const interval = setInterval(() => {
       // Не показываем спиннер при фоновом обновлении
-      dispatch(getOrdersList(buildFilters()));
+      dispatch(getLicenseCalculationRequestsList(buildFilters()));
     }, 5000);
     return () => clearInterval(interval);
   }, [dispatch, isAuthenticated, isModerator, buildFilters]);
@@ -53,19 +59,19 @@ export const OrdersPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleCardClick = (orderId: number | undefined) => {
-    if (orderId) {
-      navigate(`${ROUTES.ORDER}/${orderId}`);
+  const handleCardClick = (licenseCalculationRequestId: number | undefined) => {
+    if (licenseCalculationRequestId) {
+      navigate(`${ROUTES.ORDER}/${licenseCalculationRequestId}`);
     }
   };
 
   const applyFilters = () => {
-    dispatch(getOrdersList(buildFilters()));
+    dispatch(getLicenseCalculationRequestsList(buildFilters()));
   };
 
   if (loading) {
     return (
-      <div className="orders-page">
+      <div className="licenseCalculationRequests-page">
         <Container className="loading-container">
           <Spinner animation="border" />
         </Container>
@@ -74,11 +80,11 @@ export const OrdersPage: React.FC = () => {
   }
 
   return (
-    <div className="orders-page">
+    <div className="licenseCalculationRequests-page">
       <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.ORDERS }]} />
 
-      <Container className="orders-container">
-        <h2 className="orders-title">Мои заявки</h2>
+      <Container className="licenseCalculationRequests-container">
+        <h2 className="licenseCalculationRequests-title">Мои заявки</h2>
 
         {error && (
           <Alert variant="danger" onClose={() => dispatch(clearError())} dismissible>
@@ -86,7 +92,7 @@ export const OrdersPage: React.FC = () => {
           </Alert>
         )}
 
-        <div className="orders-filters">
+        <div className="licenseCalculationRequests-filters">
           <Row className="g-3">
             <Col md={4}>
               <Form.Group>
@@ -121,20 +127,20 @@ export const OrdersPage: React.FC = () => {
           {isModerator && <div className="text-muted small mt-2"></div>}
         </div>
 
-        {orders.length === 0 ? (
-          <div className="no-orders">
+        {licenseCalculationRequests.length === 0 ? (
+          <div className="no-licenseCalculationRequests">
             <p>У вас пока нет заявок</p>
             <Button onClick={() => navigate(ROUTES.SERVICES)}>
               Перейти к услугам
             </Button>
           </div>
         ) : (
-          <div className="orders-grid">
-            {orders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onClick={() => handleCardClick(order.id)}
+          <div className="licenseCalculationRequests-grid">
+            {licenseCalculationRequests.map((licenseCalculationRequest) => (
+              <LicenseCalculationRequestCard
+                key={licenseCalculationRequest.id}
+                licenseCalculationRequest={licenseCalculationRequest}
+                onClick={() => handleCardClick(licenseCalculationRequest.id)}
                 showReady={isModerator}
               />
             ))}
@@ -145,4 +151,4 @@ export const OrdersPage: React.FC = () => {
   );
 };
 
-export default OrdersPage;
+export default LicenseCalculationRequestsPage;

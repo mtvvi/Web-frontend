@@ -79,11 +79,11 @@ export const ServiceDetailPage: React.FC = () => {
         <BreadCrumbs
           crumbs={[
             { label: ROUTE_LABELS.SERVICES, path: ROUTES.SERVICES },
-            { label: "Услуга не найдена" },
+            { label: "Лицензия не найдена" },
           ]}
         />
         <div className="service-detail-error">
-          <h3>Услуга не найдена</h3>
+          <h3>Лицензия не найдена</h3>
           <p>К сожалению, запрашиваемая услуга не существует или была удалена.</p>
           <button className="btn-back" onClick={() => navigate(ROUTES.SERVICES)}>
             Вернуться к списку услуг
